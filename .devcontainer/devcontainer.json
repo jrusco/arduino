@@ -1,0 +1,17 @@
+{
+    "name": "Arduino Dev Container",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "settings": {
+        "C_Cpp.default.includePath": [
+            "${workspaceFolder}/**",
+            "/home/vscode/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino"
+        ]
+    },
+    "extensions": [
+        "ms-vscode.cpptools"
+    ],
+    "forwardPorts": [],
+    "postCreateCommand": "g++ --version"
+}
