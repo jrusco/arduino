@@ -2,20 +2,38 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "Arduino: Build",
             "type": "shell",
-            "command": "g++",
+            "command": "arduino-cli",
             "args": [
-                "-g",
-                "your_file.cpp",
-                "-o",
-                "your_program"
+                "compile",
+                "--fqbn",
+                "arduino:avr:uno",
+                "${workspaceFolder}"
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": []
+        },
+        {
+            "label": "Arduino: Upload",
+            "type": "shell",
+            "command": "arduino-cli",
+            "args": [
+                "upload",
+                "-p",
+                "/dev/ttyACM0", // Change this to your board's port
+                "--fqbn",
+                "arduino:avr:uno",
+                "${workspaceFolder}"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
         }
     ]
 }
