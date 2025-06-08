@@ -1,10 +1,12 @@
 #include <Arduino.h>
 
 // Asignación de pines para motores y sensores
-const int MOTOR_RIGHT_FORWARD = 12;
-const int MOTOR_RIGHT_BACKWARD = 9;
-const int MOTOR_LEFT_FORWARD = 13;
-const int MOTOR_LEFT_BACKWARD = 10;
+const int ACTIVATE_MOTOR_RIGHT = 12 ;
+const int MOTOR_RIGHT_FORWARD = 9 ;
+const int MOTOR_RIGHT_BACKWARD = 8;
+const int ACTIVATE_MOTOR_LEFT = 13 ;
+const int MOTOR_LEFT_FORWARD = 10;
+const int MOTOR_LEFT_BACKWARD = 11;
 
 const int TRIG_FRONT = 5;
 const int ECHO_FRONT = 4;
@@ -37,17 +39,21 @@ long readUltrasonicDistance(int triggerPin, int echoPin)
 void moveForward()
 {
     // Hace que el robot avance
+  	digitalWrite(ACTIVATE_MOTOR_RIGHT, HIGH);
     digitalWrite(MOTOR_RIGHT_FORWARD, HIGH);
-    digitalWrite(MOTOR_RIGHT_BACKWARD, HIGH);
+    digitalWrite(MOTOR_RIGHT_BACKWARD, LOW);
+ 	digitalWrite(ACTIVATE_MOTOR_LEFT, HIGH);
     digitalWrite(MOTOR_LEFT_FORWARD, HIGH);
-    digitalWrite(MOTOR_LEFT_BACKWARD, HIGH);
+    digitalWrite(MOTOR_LEFT_BACKWARD, LOW);
 }
 
 void stopMotors()
 {
     // Detiene todos los motores
+  	digitalWrite(ACTIVATE_MOTOR_RIGHT, LOW);
     digitalWrite(MOTOR_RIGHT_FORWARD, LOW);
     digitalWrite(MOTOR_RIGHT_BACKWARD, LOW);
+  	digitalWrite(ACTIVATE_MOTOR_LEFT, LOW);
     digitalWrite(MOTOR_LEFT_FORWARD, LOW);
     digitalWrite(MOTOR_LEFT_BACKWARD, LOW);
 }
@@ -55,8 +61,10 @@ void stopMotors()
 void turnLeft()
 {
     // Gira a la izquierda: la rueda izquierda va para atrás y la derecha para adelante
-    digitalWrite(MOTOR_LEFT_FORWARD, LOW);
+    digitalWrite(ACTIVATE_MOTOR_LEFT, HIGH);
+  	digitalWrite(MOTOR_LEFT_FORWARD, LOW);
     digitalWrite(MOTOR_LEFT_BACKWARD, HIGH);
+   	digitalWrite(ACTIVATE_MOTOR_RIGHT, HIGH);
     digitalWrite(MOTOR_RIGHT_FORWARD, HIGH);
     digitalWrite(MOTOR_RIGHT_BACKWARD, LOW);
 }
@@ -64,8 +72,10 @@ void turnLeft()
 void turnRight()
 {
     // Gira a la derecha: la rueda derecha va para atrás y la izquierda para adelante
-    digitalWrite(MOTOR_LEFT_FORWARD, HIGH);
+    digitalWrite(ACTIVATE_MOTOR_LEFT, HIGH);
+  	digitalWrite(MOTOR_LEFT_FORWARD, HIGH);
     digitalWrite(MOTOR_LEFT_BACKWARD, LOW);
+   	digitalWrite(ACTIVATE_MOTOR_RIGHT, HIGH);
     digitalWrite(MOTOR_RIGHT_FORWARD, LOW);
     digitalWrite(MOTOR_RIGHT_BACKWARD, HIGH);
 }
@@ -73,8 +83,10 @@ void turnRight()
 void setup()
 {
     // Configura los pines de los motores como salida
+    pinMode(ACTIVATE_MOTOR_RIGHT, OUTPUT);
     pinMode(MOTOR_RIGHT_FORWARD, OUTPUT);
     pinMode(MOTOR_RIGHT_BACKWARD, OUTPUT);
+    pinMode(ACTIVATE_MOTOR_LEFT, OUTPUT);
     pinMode(MOTOR_LEFT_FORWARD, OUTPUT);
     pinMode(MOTOR_LEFT_BACKWARD, OUTPUT);
 
