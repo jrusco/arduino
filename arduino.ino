@@ -143,7 +143,7 @@ void loop()
             while (true)
             {
                 turnLeft(); // Gira sobre sí mismo hacia la izquierda
-                delay(150); // Pequeña pausa para girar un poco
+                delay(300); // Pequeña pausa para girar un poco
                 stopMotors();
                 delay(50); // Pausa para medir de nuevo
 
@@ -151,7 +151,7 @@ void loop()
                 dist_front = readUltrasonicDistance(TRIG_FRONT, ECHO_FRONT);
 
                 // Si encuentra camino libre al frente, sale del bucle y avanza
-                if (dist_front > DIST_CM)
+                if (dist_front > DIST_CM * 2)
                 {
                     Serial.println("¡Camino libre encontrado!");
                     break;
