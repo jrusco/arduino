@@ -1,5 +1,6 @@
 #include <Arduino.h>
 
+
 // Asignación de pines para motores y sensores
 const int ACTIVATE_MOTOR_RIGHT = 12;
 const int MOTOR_RIGHT_FORWARD = 9;
@@ -14,6 +15,7 @@ const int TRIG_LEFT = 3;
 const int ECHO_LEFT = 2;
 const int TRIG_RIGHT = 7;
 const int ECHO_RIGHT = 6;
+const int DIST_CM = 15;
 
 // Variables para guardar las distancias (en centímetros)
 int dist_front = 0;
@@ -109,7 +111,7 @@ void loop()
     Serial.println(dist_right);
 
     // Lógica para evitar obstáculos
-    if (dist_front > 45)
+    if (dist_front > DIST_CM)
     {
         // Si el camino de adelante está libre, avanza
         moveForward();
@@ -120,14 +122,14 @@ void loop()
         stopMotors();
         delay(100); // Hace una pausa corta antes de girar
 
-        if (dist_left > 45)
+        if (dist_left > DIST_CM)
         {
             // Si la izquierda está libre, gira a la izquierda
             turnLeft();
             delay(400); // Ajustá este valor para cambiar el ángulo de giro
             stopMotors();
         }
-        else if (dist_right > 45)
+        else if (dist_right > DIST_CM)
         {
             // Si la derecha está libre, gira a la derecha
             turnRight();
@@ -141,15 +143,15 @@ void loop()
             while (true)
             {
                 turnLeft(); // Gira sobre sí mismo hacia la izquierda
-                delay(400); // Pequeña pausa para girar un poco
+                delay(150); // Pequeña pausa para girar un poco
                 stopMotors();
-                delay(400); // Pausa para medir de nuevo
+                delay(50); // Pausa para medir de nuevo
 
                 // Vuelve a medir la distancia al frente
                 dist_front = readUltrasonicDistance(TRIG_FRONT, ECHO_FRONT);
 
                 // Si encuentra camino libre al frente, sale del bucle y avanza
-                if (dist_front > 45)
+                if (dist_front > DIST_CM)
                 {
                     Serial.println("¡Camino libre encontrado!");
                     break;
