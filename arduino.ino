@@ -1,10 +1,10 @@
 #include <Arduino.h>
 
 // Asignación de pines para motores y sensores
-const int ACTIVATE_MOTOR_RIGHT = 12 ;
-const int MOTOR_RIGHT_FORWARD = 9 ;
+const int ACTIVATE_MOTOR_RIGHT = 12;
+const int MOTOR_RIGHT_FORWARD = 9;
 const int MOTOR_RIGHT_BACKWARD = 8;
-const int ACTIVATE_MOTOR_LEFT = 13 ;
+const int ACTIVATE_MOTOR_LEFT = 13;
 const int MOTOR_LEFT_FORWARD = 10;
 const int MOTOR_LEFT_BACKWARD = 11;
 
@@ -39,10 +39,10 @@ long readUltrasonicDistance(int triggerPin, int echoPin)
 void moveForward()
 {
     // Hace que el robot avance
-  	digitalWrite(ACTIVATE_MOTOR_RIGHT, HIGH);
+    digitalWrite(ACTIVATE_MOTOR_RIGHT, HIGH);
     digitalWrite(MOTOR_RIGHT_FORWARD, HIGH);
     digitalWrite(MOTOR_RIGHT_BACKWARD, LOW);
- 	digitalWrite(ACTIVATE_MOTOR_LEFT, HIGH);
+    digitalWrite(ACTIVATE_MOTOR_LEFT, HIGH);
     digitalWrite(MOTOR_LEFT_FORWARD, HIGH);
     digitalWrite(MOTOR_LEFT_BACKWARD, LOW);
 }
@@ -50,10 +50,10 @@ void moveForward()
 void stopMotors()
 {
     // Detiene todos los motores
-  	digitalWrite(ACTIVATE_MOTOR_RIGHT, LOW);
+    digitalWrite(ACTIVATE_MOTOR_RIGHT, LOW);
     digitalWrite(MOTOR_RIGHT_FORWARD, LOW);
     digitalWrite(MOTOR_RIGHT_BACKWARD, LOW);
-  	digitalWrite(ACTIVATE_MOTOR_LEFT, LOW);
+    digitalWrite(ACTIVATE_MOTOR_LEFT, LOW);
     digitalWrite(MOTOR_LEFT_FORWARD, LOW);
     digitalWrite(MOTOR_LEFT_BACKWARD, LOW);
 }
@@ -62,9 +62,9 @@ void turnLeft()
 {
     // Gira a la izquierda: la rueda izquierda va para atrás y la derecha para adelante
     digitalWrite(ACTIVATE_MOTOR_LEFT, HIGH);
-  	digitalWrite(MOTOR_LEFT_FORWARD, LOW);
+    digitalWrite(MOTOR_LEFT_FORWARD, LOW);
     digitalWrite(MOTOR_LEFT_BACKWARD, HIGH);
-   	digitalWrite(ACTIVATE_MOTOR_RIGHT, HIGH);
+    digitalWrite(ACTIVATE_MOTOR_RIGHT, HIGH);
     digitalWrite(MOTOR_RIGHT_FORWARD, HIGH);
     digitalWrite(MOTOR_RIGHT_BACKWARD, LOW);
 }
@@ -73,9 +73,9 @@ void turnRight()
 {
     // Gira a la derecha: la rueda derecha va para atrás y la izquierda para adelante
     digitalWrite(ACTIVATE_MOTOR_LEFT, HIGH);
-  	digitalWrite(MOTOR_LEFT_FORWARD, HIGH);
+    digitalWrite(MOTOR_LEFT_FORWARD, HIGH);
     digitalWrite(MOTOR_LEFT_BACKWARD, LOW);
-   	digitalWrite(ACTIVATE_MOTOR_RIGHT, HIGH);
+    digitalWrite(ACTIVATE_MOTOR_RIGHT, HIGH);
     digitalWrite(MOTOR_RIGHT_FORWARD, LOW);
     digitalWrite(MOTOR_RIGHT_BACKWARD, HIGH);
 }
@@ -136,8 +136,25 @@ void loop()
         }
         else
         {
-            // Si todos los lados están bloqueados, se detiene
-            stopMotors();
+            // Si todos los lados están bloqueados, gira sobre sí mismo hasta encontrar salida
+            Serial.println("Todos los caminos bloqueados, girando hasta encontrar salida...");
+            while (true)
+            {
+                turnLeft(); // Gira sobre sí mismo hacia la izquierda
+                delay(150); // Pequeña pausa para girar un poco
+                stopMotors();
+                delay(50); // Pausa para medir de nuevo
+
+                // Vuelve a medir la distancia al frente
+                dist_front = readUltrasonicDistance(TRIG_FRONT, ECHO_FRONT);
+
+                // Si encuentra camino libre al frente, sale del bucle y avanza
+                if (dist_front > 45)
+                {
+                    Serial.println("¡Camino libre encontrado!");
+                    break;
+                }
+            }
         }
     }
 
