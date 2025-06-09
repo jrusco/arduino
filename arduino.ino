@@ -16,6 +16,7 @@ const int ECHO_LEFT = 2;
 const int TRIG_RIGHT = 7;
 const int ECHO_RIGHT = 6;
 const int DIST_CM = 15;
+const int DELAY_MS = 250;
 
 // Variables para guardar las distancias (en centímetros)
 int dist_front = 0;
@@ -120,20 +121,20 @@ void loop()
     {
         // Si hay un obstáculo adelante, revisa los costados
         stopMotors();
-        delay(250); // Hace una pausa corta antes de girar
+        delay(DELAY_MS); // Hace una pausa corta antes de girar
 
         if (dist_left > DIST_CM)
         {
             // Si la izquierda está libre, gira a la izquierda
             turnLeft();
-            delay(1000); // Ajustá este valor para cambiar el ángulo de giro
+            delay(DELAY_MS * 4); // Ajustá este valor para cambiar el ángulo de giro
             stopMotors();
         }
         else if (dist_right > DIST_CM)
         {
             // Si la derecha está libre, gira a la derecha
             turnRight();
-            delay(1000); // Ajustá este valor para cambiar el ángulo de giro
+            delay(DELAY_MS * 4); // Ajustá este valor para cambiar el ángulo de giro
             stopMotors();
         }
         else
@@ -143,9 +144,9 @@ void loop()
             while (true)
             {
                 turnLeft(); // Gira sobre sí mismo hacia la izquierda
-                delay(2000); // Pequeña pausa para girar un poco
+                delay(DELAY_MS * 8); // Pequeña pausa para girar un poco
                 stopMotors();
-                delay(50); // Pausa para medir de nuevo
+                delay(DELAY_MS / 5); // Pausa para medir de nuevo
 
                 // Vuelve a medir la distancia al frente
                 dist_front = readUltrasonicDistance(TRIG_FRONT, ECHO_FRONT);
@@ -160,5 +161,5 @@ void loop()
         }
     }
 
-    delay(100); // Pequeña pausa antes de repetir el ciclo
+    delay(DELAY_MS / 2); // Pequeña pausa antes de repetir el ciclo
 }
