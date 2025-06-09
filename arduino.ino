@@ -111,7 +111,7 @@ void loop()
     Serial.println(dist_right);
 
     // Lógica para evitar obstáculos
-    if (dist_front > DIST_CM)
+    if (dist_front > DIST_CM * 2)
     {
         // Si el camino de adelante está libre, avanza
         moveForward();
@@ -120,20 +120,20 @@ void loop()
     {
         // Si hay un obstáculo adelante, revisa los costados
         stopMotors();
-        delay(100); // Hace una pausa corta antes de girar
+        delay(250); // Hace una pausa corta antes de girar
 
         if (dist_left > DIST_CM)
         {
             // Si la izquierda está libre, gira a la izquierda
             turnLeft();
-            delay(400); // Ajustá este valor para cambiar el ángulo de giro
+            delay(1000); // Ajustá este valor para cambiar el ángulo de giro
             stopMotors();
         }
         else if (dist_right > DIST_CM)
         {
             // Si la derecha está libre, gira a la derecha
             turnRight();
-            delay(400); // Ajustá este valor para cambiar el ángulo de giro
+            delay(1000); // Ajustá este valor para cambiar el ángulo de giro
             stopMotors();
         }
         else
@@ -143,7 +143,7 @@ void loop()
             while (true)
             {
                 turnLeft(); // Gira sobre sí mismo hacia la izquierda
-                delay(300); // Pequeña pausa para girar un poco
+                delay(2000); // Pequeña pausa para girar un poco
                 stopMotors();
                 delay(50); // Pausa para medir de nuevo
 
