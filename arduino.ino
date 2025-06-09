@@ -141,9 +141,9 @@ void loop()
             while (true)
             {
                 turnLeft(); // Gira sobre sí mismo hacia la izquierda
-                delay(150); // Pequeña pausa para girar un poco
+                delay(400); // Pequeña pausa para girar un poco
                 stopMotors();
-                delay(50); // Pausa para medir de nuevo
+                delay(400); // Pausa para medir de nuevo
 
                 // Vuelve a medir la distancia al frente
                 dist_front = readUltrasonicDistance(TRIG_FRONT, ECHO_FRONT);
