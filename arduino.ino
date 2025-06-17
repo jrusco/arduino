@@ -15,7 +15,7 @@ const int TRIG_LEFT = 3;
 const int ECHO_LEFT = 2;
 const int TRIG_RIGHT = 7;
 const int ECHO_RIGHT = 6;
-const int DIST_CM = 15;
+const int DIST_CM = 5;
 const int DELAY_MS = 250;
 
 // Variables para guardar las distancias (en centímetros)
