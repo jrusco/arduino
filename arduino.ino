@@ -16,7 +16,7 @@ const int ECHO_LEFT = 2;
 const int TRIG_RIGHT = 7;
 const int ECHO_RIGHT = 6;
 const int DIST_CM = 6;
-const int DELAY_MS = 180;
+const int DELAY_MS = 200;
 
 // Variables para guardar las distancias (en centímetros)
 int dist_front = 0;
@@ -83,6 +83,18 @@ void girarIzquierda()
     digitalWrite(MOTOR_RIGHT_BACKWARD, HIGH);
 }
 
+String decidirDireccion(float dist_left, float dist_right) {
+
+    bool izquierdaLibre = dist_left > DIST_CM && dist_left < DIST_CM * 150;
+    bool derechaLibre  = dist_right > DIST_CM && dist_right < DIST_CM * 150;
+
+    if (!izquierdaLibre && !derechaLibre) {
+        return "BLOQUEADO";
+    }
+
+    return (dist_left > dist_right) ? "IZQUIERDA" : "DERECHA";
+}
+
 void setup()
 {
     // Configura los pines de los motores como salida
@@ -123,14 +135,16 @@ void loop()
         parar();
         delay(DELAY_MS); // Hace una pausa corta antes de girar
 
-        if (dist_left > DIST_CM && dist_left < DIST_CM * 150)
+        String direccion = decidirDireccion(dist_left, dist_right);
+
+        if (direccion == "DERECHA")
         {
             // Si la izquierda está libre, gira a la izquierda
             girarDerecha();
             delay(DELAY_MS * 2); // Ajustá este valor para cambiar el ángulo de giro
             parar();
         }
-        else if (dist_right > DIST_CM && dist_right < DIST_CM * 150)
+        else if (direccion == "IZQUIERDA")
         {
             // Si la derecha está libre, gira a la derecha
             girarIzquierda();
