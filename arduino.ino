@@ -15,8 +15,8 @@ const int TRIG_LEFT = 3;
 const int ECHO_LEFT = 2;
 const int TRIG_RIGHT = 7;
 const int ECHO_RIGHT = 6;
-const int DIST_CM = 5;
-const int DELAY_MS = 250;
+const int DIST_CM = 6;
+const int DELAY_MS = 180;
 
 // Variables para guardar las distancias (en centímetros)
 int dist_front = 0;
@@ -39,7 +39,7 @@ long readUltrasonicDistance(int triggerPin, int echoPin)
 }
 
 // Funciones para controlar los motores
-void moveForward()
+void avanzar()
 {
     // Hace que el robot avance
     digitalWrite(ACTIVATE_MOTOR_RIGHT, HIGH);
@@ -50,7 +50,7 @@ void moveForward()
     digitalWrite(MOTOR_LEFT_BACKWARD, LOW);
 }
 
-void stopMotors()
+void parar()
 {
     // Detiene todos los motores
     digitalWrite(ACTIVATE_MOTOR_RIGHT, LOW);
@@ -61,9 +61,9 @@ void stopMotors()
     digitalWrite(MOTOR_LEFT_BACKWARD, LOW);
 }
 
-void turnLeft()
+void girarDerecha()
 {
-    // Gira a la izquierda: la rueda izquierda va para atrás y la derecha para adelante
+    // Gira a la derecha: la rueda izquierda va para adelante y la derecha para atras
     digitalWrite(ACTIVATE_MOTOR_LEFT, HIGH);
     digitalWrite(MOTOR_LEFT_FORWARD, LOW);
     digitalWrite(MOTOR_LEFT_BACKWARD, HIGH);
@@ -72,7 +72,7 @@ void turnLeft()
     digitalWrite(MOTOR_RIGHT_BACKWARD, LOW);
 }
 
-void turnRight()
+void girarIzquierda()
 {
     // Gira a la derecha: la rueda derecha va para atrás y la izquierda para adelante
     digitalWrite(ACTIVATE_MOTOR_LEFT, HIGH);
@@ -112,30 +112,30 @@ void loop()
     Serial.println(dist_right);
 
     // Lógica para evitar obstáculos
-    if (dist_front > DIST_CM * 2)
+    if (dist_front > DIST_CM * 2 && dist_front < DIST_CM * 150 )
     {
         // Si el camino de adelante está libre, avanza
-        moveForward();
+        avanzar();
     }
     else
     {
         // Si hay un obstáculo adelante, revisa los costados
-        stopMotors();
+        parar();
         delay(DELAY_MS); // Hace una pausa corta antes de girar
 
-        if (dist_left > DIST_CM)
+        if (dist_left > DIST_CM && dist_left < DIST_CM * 150)
         {
             // Si la izquierda está libre, gira a la izquierda
-            turnLeft();
-            delay(DELAY_MS * 4); // Ajustá este valor para cambiar el ángulo de giro
-            stopMotors();
+            girarDerecha();
+            delay(DELAY_MS * 2); // Ajustá este valor para cambiar el ángulo de giro
+            parar();
         }
-        else if (dist_right > DIST_CM)
+        else if (dist_right > DIST_CM && dist_right < DIST_CM * 150)
         {
             // Si la derecha está libre, gira a la derecha
-            turnRight();
-            delay(DELAY_MS * 4); // Ajustá este valor para cambiar el ángulo de giro
-            stopMotors();
+            girarIzquierda();
+            delay(DELAY_MS * 2); // Ajustá este valor para cambiar el ángulo de giro
+            parar();
         }
         else
         {
@@ -143,9 +143,9 @@ void loop()
             Serial.println("Todos los caminos bloqueados, girando hasta encontrar salida...");
             while (true)
             {
-                turnLeft(); // Gira sobre sí mismo hacia la izquierda
-                delay(DELAY_MS * 8); // Pequeña pausa para girar un poco
-                stopMotors();
+                girarDerecha(); // Gira sobre sí mismo hacia la izquierda
+                delay(DELAY_MS * 4); // Pequeña pausa para girar un poco
+                parar();
                 delay(DELAY_MS / 5); // Pausa para medir de nuevo
 
                 // Vuelve a medir la distancia al frente
