@@ -83,17 +83,7 @@ void girarIzquierda()
     digitalWrite(MOTOR_RIGHT_BACKWARD, HIGH);
 }
 
-String decidirDireccion(float dist_left, float dist_right) {
 
-    bool izquierdaLibre = dist_left > DIST_CM && dist_left < DIST_CM * 150;
-    bool derechaLibre  = dist_right > DIST_CM && dist_right < DIST_CM * 150;
-
-    if (!izquierdaLibre && !derechaLibre) {
-        return "BLOQUEADO";
-    }
-
-    return (dist_left > dist_right) ? "IZQUIERDA" : "DERECHA";
-}
 
 void setup()
 {
@@ -123,54 +113,54 @@ void loop()
     Serial.print(" cm, Derecha: ");
     Serial.println(dist_right);
 
-    // Lógica para evitar obstáculos
-    if (dist_front > DIST_CM * 2 && dist_front < DIST_CM * 150 )
+    // Lógica para evitar obstáculos con prioridad: izquierda → frente → derecha
+    bool izquierdaLibre = dist_left > DIST_CM && dist_left < DIST_CM * 150;
+    bool frenteLibre = dist_front > DIST_CM * 2 && dist_front < DIST_CM * 150;
+    bool derechaLibre = dist_right > DIST_CM && dist_right < DIST_CM * 150;
+
+    if (izquierdaLibre)
     {
-        // Si el camino de adelante está libre, avanza
+        // Primera prioridad: si la izquierda está libre, gira a la izquierda
+        parar();
+        delay(DELAY_MS); // Hace una pausa corta antes de girar
+        girarIzquierda();
+        delay(DELAY_MS * 2); // Ajustá este valor para cambiar el ángulo de giro
+        parar();
+    }
+    else if (frenteLibre)
+    {
+        // Segunda prioridad: si el frente está libre, avanza
         avanzar();
+    }
+    else if (derechaLibre)
+    {
+        // Tercera prioridad: si la derecha está libre, gira a la derecha
+        parar();
+        delay(DELAY_MS); // Hace una pausa corta antes de girar
+        girarDerecha();
+        delay(DELAY_MS * 2); // Ajustá este valor para cambiar el ángulo de giro
+        parar();
     }
     else
     {
-        // Si hay un obstáculo adelante, revisa los costados
+        // Si todos los lados están bloqueados, gira sobre sí mismo hasta encontrar salida
         parar();
-        delay(DELAY_MS); // Hace una pausa corta antes de girar
-
-        String direccion = decidirDireccion(dist_left, dist_right);
-
-        if (direccion == "DERECHA")
+        Serial.println("Todos los caminos bloqueados, girando hasta encontrar salida...");
+        while (true)
         {
-            // Si la izquierda está libre, gira a la izquierda
-            girarDerecha();
-            delay(DELAY_MS * 2); // Ajustá este valor para cambiar el ángulo de giro
+            girarDerecha(); // Gira sobre sí mismo hacia la izquierda
+            delay(DELAY_MS * 4); // Pequeña pausa para girar un poco
             parar();
-        }
-        else if (direccion == "IZQUIERDA")
-        {
-            // Si la derecha está libre, gira a la derecha
-            girarIzquierda();
-            delay(DELAY_MS * 2); // Ajustá este valor para cambiar el ángulo de giro
-            parar();
-        }
-        else
-        {
-            // Si todos los lados están bloqueados, gira sobre sí mismo hasta encontrar salida
-            Serial.println("Todos los caminos bloqueados, girando hasta encontrar salida...");
-            while (true)
+            delay(DELAY_MS / 5); // Pausa para medir de nuevo
+
+            // Vuelve a medir la distancia al frente
+            dist_front = readUltrasonicDistance(TRIG_FRONT, ECHO_FRONT);
+
+            // Si encuentra camino libre al frente, sale del bucle y avanza
+            if (dist_front > DIST_CM * 2)
             {
-                girarDerecha(); // Gira sobre sí mismo hacia la izquierda
-                delay(DELAY_MS * 4); // Pequeña pausa para girar un poco
-                parar();
-                delay(DELAY_MS / 5); // Pausa para medir de nuevo
-
-                // Vuelve a medir la distancia al frente
-                dist_front = readUltrasonicDistance(TRIG_FRONT, ECHO_FRONT);
-
-                // Si encuentra camino libre al frente, sale del bucle y avanza
-                if (dist_front > DIST_CM * 2)
-                {
-                    Serial.println("¡Camino libre encontrado!");
-                    break;
-                }
+                Serial.println("¡Camino libre encontrado!");
+                break;
             }
         }
     }
