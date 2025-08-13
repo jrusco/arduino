@@ -10,7 +10,8 @@
         ]
     },
     "extensions": [
-        "ms-vscode.cpptools"
+        "ms-vscode.cpptools",
+        "anthropic.claude-vscode"
     ],
     "forwardPorts": [],
     "postCreateCommand": "g++ --version"

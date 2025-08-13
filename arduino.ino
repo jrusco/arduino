@@ -18,6 +18,11 @@ const int ECHO_RIGHT = 6;
 const int DIST_CM = 6;
 const int DELAY_MS = 200;
 
+// Variables para comportamiento de curiosidad
+int pasosAvanzados = 0;           // Contador de pasos avanzados
+const int CURIOSIDAD = 5;         // Revisar lados cada 5 pasos
+const int APERTURA_MINIMA = 15;   // Tamaño mínimo de apertura para explorar
+
 // Variables para guardar las distancias (en centímetros)
 int dist_front = 0;
 int dist_left = 0;
@@ -95,6 +100,26 @@ String decidirDireccion(float dist_left, float dist_right) {
     return (dist_left > dist_right) ? "IZQUIERDA" : "DERECHA";
 }
 
+// Nueva función: explorar lados buscando aperturas
+String explorarLados(float dist_left, float dist_right) {
+    // Busca aberturas lo suficientemente grandes para explorar
+    bool aperturaIzquierda = dist_left > APERTURA_MINIMA && dist_left < DIST_CM * 150;
+    bool aperturaDerecha = dist_right > APERTURA_MINIMA && dist_right < DIST_CM * 150;
+    
+    if (!aperturaIzquierda && !aperturaDerecha) {
+        return "CONTINUAR";  // No hay aperturas interesantes
+    }
+    
+    // Si hay aperturas, elegir la más grande
+    if (aperturaIzquierda && aperturaDerecha) {
+        return (dist_left > dist_right) ? "IZQUIERDA" : "DERECHA";
+    } else if (aperturaIzquierda) {
+        return "IZQUIERDA";
+    } else {
+        return "DERECHA";
+    }
+}
+
 void setup()
 {
     // Configura los pines de los motores como salida
@@ -123,49 +148,80 @@ void loop()
     Serial.print(" cm, Derecha: ");
     Serial.println(dist_right);
 
-    // Lógica para evitar obstáculos
+    // Lógica mejorada: evitar obstáculos + comportamiento de curiosidad
     if (dist_front > DIST_CM * 2 && dist_front < DIST_CM * 150 )
     {
-        // Si el camino de adelante está libre, avanza
-        avanzar();
+        // El camino adelante está libre
+        pasosAvanzados++; // Incrementar contador de pasos
+        
+        // Revisar si es hora de ser curioso
+        if (pasosAvanzados >= CURIOSIDAD) {
+            Serial.println("🤔 ¡Momento de curiosidad! Revisando lados...");
+            parar();
+            delay(DELAY_MS); // Pausa para medir bien
+            
+            String exploracion = explorarLados(dist_left, dist_right);
+            
+            if (exploracion != "CONTINUAR") {
+                Serial.print("¡Apertura encontrada hacia: ");
+                Serial.println(exploracion);
+                
+                // Girar hacia la apertura encontrada
+                if (exploracion == "DERECHA") {
+                    girarDerecha();
+                    delay(DELAY_MS * 2);
+                    parar();
+                } else if (exploracion == "IZQUIERDA") {
+                    girarIzquierda();
+                    delay(DELAY_MS * 2);
+                    parar();
+                }
+                pasosAvanzados = 0; // Reiniciar contador
+            } else {
+                Serial.println("No hay aperturas interesantes, siguiendo adelante");
+                pasosAvanzados = 0; // Reiniciar contador de curiosidad
+                avanzar();
+            }
+        } else {
+            // Avanzar normalmente
+            avanzar();
+        }
     }
     else
     {
-        // Si hay un obstáculo adelante, revisa los costados
+        // Si hay un obstáculo adelante, usar lógica original
         parar();
-        delay(DELAY_MS); // Hace una pausa corta antes de girar
+        delay(DELAY_MS);
+        pasosAvanzados = 0; // Reiniciar contador cuando hay obstáculo
 
         String direccion = decidirDireccion(dist_left, dist_right);
 
         if (direccion == "DERECHA")
         {
-            // Si la izquierda está libre, gira a la izquierda
+            Serial.println("Obstáculo detectado - girando a la derecha");
             girarDerecha();
-            delay(DELAY_MS * 2); // Ajustá este valor para cambiar el ángulo de giro
+            delay(DELAY_MS * 2);
             parar();
         }
         else if (direccion == "IZQUIERDA")
         {
-            // Si la derecha está libre, gira a la derecha
+            Serial.println("Obstáculo detectado - girando a la izquierda");
             girarIzquierda();
-            delay(DELAY_MS * 2); // Ajustá este valor para cambiar el ángulo de giro
+            delay(DELAY_MS * 2);
             parar();
         }
         else
         {
-            // Si todos los lados están bloqueados, gira sobre sí mismo hasta encontrar salida
             Serial.println("Todos los caminos bloqueados, girando hasta encontrar salida...");
             while (true)
             {
-                girarDerecha(); // Gira sobre sí mismo hacia la izquierda
-                delay(DELAY_MS * 4); // Pequeña pausa para girar un poco
+                girarDerecha();
+                delay(DELAY_MS * 4);
                 parar();
-                delay(DELAY_MS / 5); // Pausa para medir de nuevo
+                delay(DELAY_MS / 5);
 
-                // Vuelve a medir la distancia al frente
                 dist_front = readUltrasonicDistance(TRIG_FRONT, ECHO_FRONT);
 
-                // Si encuentra camino libre al frente, sale del bucle y avanza
                 if (dist_front > DIST_CM * 2)
                 {
                     Serial.println("¡Camino libre encontrado!");
