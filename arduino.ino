@@ -166,12 +166,18 @@ void loop()
                 Serial.print("¡Apertura encontrada hacia: ");
                 Serial.println(exploracion);
                 
-                // Girar hacia la apertura encontrada
+                // Girar hacia la apertura encontrada con cierto grado de avance para salvar obstaculo
                 if (exploracion == "DERECHA") {
+                    avanzar();
+                    delay(DELAY_MS);
+                    parar();
                     girarDerecha();
                     delay(DELAY_MS * 2);
                     parar();
                 } else if (exploracion == "IZQUIERDA") {
+                    avanzar();
+                    delay(DELAY_MS);
+                    parar();
                     girarIzquierda();
                     delay(DELAY_MS * 2);
                     parar();
